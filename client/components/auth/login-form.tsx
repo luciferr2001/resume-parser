@@ -8,6 +8,8 @@ import { useState, useTransition } from "react";
 
 import { useForm } from "react-hook-form";
 
+import { useSearchParams } from "next/navigation";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Form, FormControl, FormField, FormLabel, FormMessage, FormItem } from "@/components/ui/form";
@@ -20,11 +22,11 @@ import { FormSuccess } from "@/components/form-success";
 import { login } from "@/actions/login";
 
 export const LoginForm = () => {
-
-  const [isPending,startTransition]=useTransition();
-
-  const [error,setError]=useState<string | undefined>("");
-  const [success,setSuccess]=useState<string | undefined>("");
+    const searchParams = useSearchParams();
+    const urlError=searchParams.get("error")==="OAuthAccountNotLinked" ? "Email Already in use with different provider" :""
+    const [isPending, startTransition] = useTransition();
+    const [error, setError] = useState<string | undefined>("");
+    const [success, setSuccess] = useState<string | undefined>("");
 
     const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
@@ -34,16 +36,16 @@ export const LoginForm = () => {
         },
     });
 
-    const onSubmit=(values:z.infer<typeof LoginSchema>)=>{
-      setError("");
-      setSuccess("");
-      startTransition(()=>{
-        login(values).then((data)=>{
-          setError(data.error);
-          setSuccess(data.success);
-        })
-      })
-    }
+    const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+        setError("");
+        setSuccess("");
+        startTransition(() => {
+            login(values).then((data) => {
+                setError(data.error);
+                setSuccess(data.success);
+            });
+        });
+    };
     return (
         <CardWrapper headerLabel="Welcome Back" backButtonLabel="Dont Have An Account?" backButtonHref="/auth/register" showSocial>
             <Form {...form}>
@@ -76,9 +78,11 @@ export const LoginForm = () => {
                             )}
                         />
                     </div>
-                    <FormError message={error}/>
-                    <FormSuccess message={success}/>
-                    <Button disabled={isPending} type="submit" className="w-full">Login</Button>
+                    <FormError message={error || urlError} />
+                    <FormSuccess message={success} />
+                    <Button disabled={isPending} type="submit" className="w-full">
+                        Login
+                    </Button>
                 </form>
             </Form>
         </CardWrapper>

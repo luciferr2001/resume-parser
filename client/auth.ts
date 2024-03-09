@@ -16,6 +16,10 @@ export const {
   signIn,
   signOut
 } = NextAuth({
+  pages: {
+    signIn: '/auth/login',
+    error: '/auth/error'
+  },
   events: {
     async linkAccount({ user }) {
       await db.user.update({
@@ -25,13 +29,16 @@ export const {
     }
   },
   callbacks: {
-    // async signIn({user}){
-    //   const exisitngUser = await getUserById(user.id)
-    //   if(!exisitngUser || !exisitngUser.emailVerified){
-    //     return false;
-    //   }
-    //   return true
-    // },
+    async signIn({ user, account }) {
+      if (account?.provider !== "credentials") return true
+
+      const exisitngUser = await getUserById(user.id)
+      // Prevvent sign in without email verification
+      if (!exisitngUser || !exisitngUser.emailVerified) return false;
+
+      // TODO 2FA Check
+      return true
+    },
     async session({ token, session }) {
       if (token.sub && session.user) {
         session.user.id = token.sub

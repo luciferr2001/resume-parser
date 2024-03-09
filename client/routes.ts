@@ -3,7 +3,8 @@
  * @type {string[]}
  */
 export const publicRoutes: string[]=[
-    "/"
+    "/",
+    "/auth/new-verification",
 ];
 
 /**

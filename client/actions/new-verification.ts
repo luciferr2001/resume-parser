@@ -5,11 +5,11 @@ import { db } from '@/lib/db'
 
 import { getUserByEmail } from '@/data/user';
 
-import { gerVerfificationTokenByToken } from '@/data/verification-token';
+import { getVerfificationTokenByToken } from '@/data/verification-token';
 
 
 export const newVerification = async (token: string) => {
-    const existingToken = await gerVerfificationTokenByToken(token)
+    const existingToken = await getVerfificationTokenByToken(token)
 
     if (!existingToken) {
         return { error: 'Token does not exists!' }
